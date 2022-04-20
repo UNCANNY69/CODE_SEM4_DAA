@@ -53,7 +53,8 @@ int DFS(int src, int dst, int n, int k, const connection_t connections[n][n], in
     return *flag;
 }
 
-int q2(const airport_t *src, const airport_t *dest, int n, int k, const connection_t connections[n][n])
+int q2(const airport_t *src, const airport_t *dest, int n, int k,
+ const connection_t connections[n][n])
 {
     int visited[n];
     int flag = 0;
