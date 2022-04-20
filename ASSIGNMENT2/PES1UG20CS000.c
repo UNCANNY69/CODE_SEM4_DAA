@@ -1,8 +1,10 @@
 #include "header.h"
 
 // ANY STATIC FUNCTIONS ARE UP HERE
+int DFS(int src, int dst, int n, int k, const connection_t connections[n][n])
+{
 
-
+}
 // YOUR SOLUTIONS BELOW
 
 int q1(int n, const connection_t connections[n][n])
@@ -13,6 +15,7 @@ int q1(int n, const connection_t connections[n][n])
 int q2(const airport_t *src, const airport_t *dest, int n, int k,
        const connection_t connections[n][n])
 {
+    DFS(src->num_id , dest->num_id ,n,k, connections);
     return 0;
 }
 
