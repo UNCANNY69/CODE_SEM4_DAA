@@ -31,61 +31,58 @@ struct pair
 };
 typedef struct pair pair_t;
 
-void DFS(int src, int dst, int n, int k, const connection_t connections[n][n], int *flag, int count, int visited[n])
+int str_match(airport_t a, airport_t b)
 {
-    if (visited[src] == 1 || *flag == 1)
+    int i = 0;
+    int count = 0;
+    while (a.airport_name[i] != '\0' && b.airport_name[i] != '\0')
     {
-        return;
-    }
-    else
-    {
-        visited[src] = 1;
-        count++;
-        if (src == dst && count <= k)
+        if (a.airport_name[i] == b.airport_name[i])
         {
-            *flag = 1;
+            count++;
+            i++;
         }
-        for (int i = 0; i < n && src != dst; i++)
+        else
         {
-            if (connections[src][i].distance != 0 && connections[src][i].distance != INT_MAX)
-            {
-
-                DFS(i, dst, n, k, connections, flag, count, visited);
-            }
+            return count;
         }
-        visited[src] = 0;
     }
+    return count;
 }
 
-int q2(const airport_t *src, const airport_t *dest, int n, int k, const connection_t connections[n][n])
+pair_t q5(int n, airport_t airports[n])
 {
-    int visited[n];
+    int max = 0, temp = 0;
+    pair_t ans = {-1, -1};
     for (int i = 0; i < n; i++)
     {
-        visited[i] = 0;
+        for (int j = i + 1; j < n; j++)
+        {
+            temp = str_match(airports[i], airports[j]);
+            if (max < temp)
+            {
+                max = temp;
+                ans.first = i;
+                ans.second = j;
+            }
+        }
     }
-    int flag = 0;
-    DFS(src->num_id, dest->num_id, n, k, connections, &flag, -1, visited);
-    return flag;
+    return ans;
 }
 
 int main()
 {
-    airport_t src = {0, "BLR"};
-    airport_t dest = {1, "MUM"};
-    int n = 3;
-    int k = 1;
-    connection_t connections[3][3] = {
-        {{0, 0}, {INT_MAX, INT_MAX}, {3, 3}},
-        {{INT_MAX, INT_MAX}, {0, 0}, {2, 3}},
-        {{INT_MAX, INT_MAX}, {2, 3}, {0, 0}}};
+    {
+        airport_t q5_t2_airports[] = {{0, "BLR"}, {1, "MUM"}, {2, "BLR"}};
+            pair_t q5_t2_result = q5(3, q5_t2_airports);
 
-    if (q2(&src, &dest, n, k, connections))
-    {
-        printf("Q2 TestCase 1: PASSED");
-    }
-    else
-    {
-        printf("FAILED");
+            if (q5_t2_result.first == 0 && q5_t2_result.second == 2)
+            {
+                printf("Q5 TestCase 2: PASSED" );
+            }
+            else
+            {
+                printf("Q5 TestCase 2: FAILED" );
+            }
     }
 }
