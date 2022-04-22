@@ -146,11 +146,12 @@ int main()
 {
     vinfo selected[5];
     vinfo n_selected[5];
-    int source = 0;
+   
     int graph[5][5] = {{9999, 10, 3, 9999, 9999}, {9999, 9999, 1, 2, 9999}, {9999, 4, 9999, 8, 2}, {9999, 9999, 9999, 9999, 7}, {9999, 9999, 9999, 9, 9999}};
     heap_t heap;
     init_heap(&heap, 5, n_selected);
     init_struct(&heap, 5);
+    heapify(&heap);
     for (int i = 0; i < 5; i++)
     {
         relax_edge(&heap, selected, graph);
