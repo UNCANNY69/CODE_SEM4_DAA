@@ -28,6 +28,4 @@ int main(){
         merg_arr[k] = arr1[i];
         k++;i++;
     }
-
-
 }

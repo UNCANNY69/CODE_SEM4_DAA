@@ -31,58 +31,56 @@ struct pair
 };
 typedef struct pair pair_t;
 
-int str_match(airport_t a, airport_t b)
+void q7(int n, const char *pat, int contains[n], const airport_t airports[n])
 {
-    int i = 0;
-    int count = 0;
-    while (a.airport_name[i] != '\0' && b.airport_name[i] != '\0')
+    char shift[126];
+    int m = strlen(pat);
+    for (int i = 0; i < 126; i++)
     {
-        if (a.airport_name[i] == b.airport_name[i])
-        {
-            count++;
-            i++;
-        }
-        else
-        {
-            return count;
-        }
+        shift[i] = m;
     }
-    return count;
-}
-
-pair_t q5(int n, airport_t airports[n])
-{
-    int max = 0, temp = 0;
-    pair_t ans = {-1, -1};
-    for (int i = 0; i < n; i++)
+    for (int j = 0; j < m - 1; j++)
     {
-        for (int j = i + 1; j < n; j++)
+        shift[pat[j]] = m - j - 1;
+    }
+    for (int a = 0; a < n; a++)
+    {
+        int s = strlen(airports[a].airport_name), flag;
+        for (int i = 0; i < s; i++)
         {
-            temp = str_match(airports[i], airports[j]);
-            if (max < temp)
+            flag = 1;
+            for (int j = m - 1; j >= 0 && flag == 1; j--)
             {
-                max = temp;
-                ans.first = i;
-                ans.second = j;
+                if (airports[a].airport_name[i + j] != pat[j])
+                {
+                    flag = 0;
+                    i += shift[airports[a].airport_name[i + m - 1]] - 1;
+                }
+                else if (j == 0)
+                {
+                    contains[a] = 1;
+                }
             }
         }
     }
-    return ans;
 }
-
 int main()
 {
     {
-        airport_t q5_t2_airports[] = {{0, "BLR"}, {1, "MUM"}, {2, "BLR"}};
-            pair_t q5_t2_result = q5(3, q5_t2_airports);
+        int n = 3;
+        const char *pat = "TA";
+        int contains[3] = {0, 0, 0};
+        airport_t q7_t1_airports[] = {{0, "KOCHI"}, {1, "KTA"}, {2, "KOLKATA"}};
 
-            if (q5_t2_result.first == 0 && q5_t2_result.second == 2)
-            {
-                printf("Q5 TestCase 2: PASSED" );
-            }
-            else
-            {
-                printf("Q5 TestCase 2: FAILED" );
-            }
+        q7(n, pat, contains, q7_t1_airports);
+
+        if (contains[0] == 0 && contains[1] == 1 && contains[2] == 1)
+        {
+            printf("Q7 TestCase 1: PASSED");
+        }
+        else
+        {
+            printf("Q7 TestCase 1: FAILED");
+        }
     }
 }

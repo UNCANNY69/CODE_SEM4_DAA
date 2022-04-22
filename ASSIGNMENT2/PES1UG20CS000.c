@@ -140,11 +140,74 @@ pair_t q5(int n, airport_t airports[n])
 
 int q6(int n, int amount, const int entry_fee[n])
 {
-    return 0;
+    int low = 0, high = n-1, m = (low+high) / 2;
+    while (low != high && entry_fee[m] != amount)
+    {
+        
+        if (entry_fee[m] > amount)
+        {
+            high = m - 1;
+        }
+        else
+        {
+            low = m + 1;
+        }
+        m = (low+high) / 2;
+    }
+    if (entry_fee[m] == amount)
+    {
+        if (entry_fee[m + 1] != amount)
+            return m + 1;
+        else
+        {
+            while (entry_fee[m] <= amount && m<n)
+            {
+                m++;
+            }
+            return m;
+        }
+    }
+    else
+    {
+        if (amount < entry_fee[low])
+            return low;
+        else
+            return low + 1;
+    }
 }
 
 void q7(int n, const char *pat, int contains[n], const airport_t airports[n])
 {
+    char shift[126];
+    int m = strlen(pat);
+    for (int i = 0; i < 126; i++)
+    {
+        shift[i] = m;
+    }
+    for (int j = 0; j < m - 1; j++)
+    {
+        shift[pat[j]] = m - j - 1;
+    }
+    for (int a = 0; a < n; a++)
+    {
+        int s = strlen(airports[a].airport_name), flag;
+        for (int i = 0; i < s; i++)
+        {
+            flag = 1;
+            for (int j = m - 1; j >= 0 && flag == 1; j--)
+            {
+                if (airports[a].airport_name[i + j] != pat[j])
+                {
+                    flag = 0;
+                    i += shift[airports[a].airport_name[i + m - 1]] - 1;
+                }
+                else if (j == 0)
+                {
+                    contains[a] = 1;
+                }
+            }
+        }
+    }
 }
 
 int q8(int n, int trip_order[n - 1], const connection_t connections[n][n])
