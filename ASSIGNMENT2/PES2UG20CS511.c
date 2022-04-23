@@ -18,13 +18,20 @@ struct heap
 };
 typedef struct heap heap_t;
 
-// ANY STATIC FUNCTIONS ARE UP HERE
-typedef struct vinfo
+struct pv
+{
+    int visited;
+    int parent;
+};
+typedef struct pv pv;
+
+struct vinfo
 {
     int vid;
     int d;
     int p;
-} vinfo;
+};
+typedef struct vinfo vinfo;
 
 struct heaps
 {
@@ -34,13 +41,38 @@ struct heaps
 };
 typedef struct heaps heap_e;
 
-void init_heap2(heap_e *heap, int max_size, vinfo *n_selected)
+// ANY STATIC FUNCTIONS ARE UP HERE
+
+
+static void cycle(int n, pv *pv_arr, const connection_t connections[n][n], int source, int src, int *flag)
+{
+    pv_arr[source].visited = 1;
+    for (int i = 0; i < n; i++)
+    {
+        if (connections[source][i].distance != 0 && connections[source][i].distance != INT_MAX)
+        {
+            if (pv_arr[i].visited != 1)
+            {
+                pv_arr[i].parent = source;
+                cycle(n, pv_arr, connections, i, src, flag);
+            }
+            else if(src == i && pv_arr[source].parent != src)
+            {
+                *flag = 1;
+            }
+        }
+    }
+    pv_arr[source].visited = 0;
+}
+
+static void init_heap2(heap_e *heap, int max_size, vinfo *n_selected)
 {
     heap->size = max_size;
     heap->max_size = max_size;
     heap->arr = n_selected; // allocating memory for array
 }
-void heapify2(heap_e *heap)
+
+static void heapify2(heap_e *heap)
 {
     int p, flag = 0, c;
     vinfo temp;
@@ -71,7 +103,7 @@ void heapify2(heap_e *heap)
     }
 }
 
-vinfo extract_maxs(heap_e *heap)
+static vinfo extract_maxs(heap_e *heap)
 {
     if (heap->size > 0)
     {
@@ -83,7 +115,7 @@ vinfo extract_maxs(heap_e *heap)
     }
 }
 
-int find(heap_e *heap, int a)
+static int find(heap_e *heap, int a)
 {
     for (int i = 0; i < heap->size; i++)
     {
@@ -94,7 +126,7 @@ int find(heap_e *heap, int a)
     }
 }
 
-int find_s(int n, vinfo *selected, int a)
+static int find_s(int n, vinfo *selected, int a)
 {
     for (int i = 0; i < n; i++)
     {
@@ -105,7 +137,7 @@ int find_s(int n, vinfo *selected, int a)
     }
 }
 
-void relax_edge(int n, heap_e *heap, vinfo *selected, connection_t connections[n][n])
+static void relax_edge(int n, heap_e *heap, vinfo *selected, const connection_t connections[n][n])
 {
     int source = heap->arr[0].vid, index = 0;
     for (int i = 0; i < n; i++)
@@ -121,7 +153,8 @@ void relax_edge(int n, heap_e *heap, vinfo *selected, connection_t connections[n
         }
     }
 }
-void shortest_path(int n, int k, vinfo *selected, int destinations[k], int costs[k])
+
+static void shortest_path(int n, int k, vinfo *selected, const int destinations[k], int costs[k])
 {
     int index = 0;
     for (int i = 0; i < k; i++)
@@ -130,6 +163,7 @@ void shortest_path(int n, int k, vinfo *selected, int destinations[k], int costs
         costs[i] = selected[index].d;
     }
 }
+
 static void init_struct(heap_e *heap, int size, int source)
 {
     for (int i = 0; i < size; i++)
@@ -300,15 +334,100 @@ static void DFS(int src, int dst, int n, int k, const connection_t connections[n
     }
 }
 
+static void path_gen(int n, int *trip_order, pv *pv_arr, int source, int loop, const connection_t connections[n][n], int *min)
+{
+    int count = 1, mini = connections[loop][source].distance, temp = 0, temp2 = loop;
+    while (loop != source)
+    {
+        count++;
+        temp = loop;
+        loop = pv_arr[loop].parent;
+        mini += connections[loop][temp].distance;
+    }
+    if (count == n - 1 && *min > mini)
+    {
+        *min = mini;
+        loop = temp2;
+        for (int i = n - 2; i >= 0; i--)
+        {
+            trip_order[i] = loop;
+            loop = pv_arr[loop].parent;
+        }
+        trip_order[0] = source;
+    }
+}
+
+static void d_cycle(int n, pv *pv_arr, const connection_t connections[n][n], int source, int *trip_order, int *min)
+{
+    pv_arr[source].visited = 1;
+    for (int i = 0; i < n; i++)
+    {
+        if (connections[source][i].distance != 0 && connections[source][i].distance != INT_MAX)
+        {
+            if (pv_arr[i].visited != 1)
+            {
+                pv_arr[i].parent = source;
+                d_cycle(n, pv_arr, connections, i, trip_order, min);
+            }
+            else if (pv_arr[source].parent != i)
+            {
+                path_gen(n, trip_order, pv_arr, i, source, connections, min);
+            }
+        }
+    }
+    pv_arr[source].visited = 0;
+}
+
 // ************************YOUR SOLUTIONS BELOW****************************
 
 int q1(int n, const connection_t connections[n][n])
 {
-    return 0;
+    int R[n][n];
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (connections[i][j].distance != 0 && connections[i][j].distance != INT_MAX)
+            {
+                R[i][j] = 1;
+            }
+            else
+            {
+                R[i][j] = 0;
+            }
+        }
+    }
+    for (int k = 0; k < n; k++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (i != k)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (j != k)
+                    {
+                        if (R[k][j] == 1 && R[i][k] == 1)
+                        {
+                            R[i][j] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (R[i][j] == 0)
+                return 0;
+        }
+    }
+    return 1;
 }
 
-int q2(const airport_t *src, const airport_t *dest, int n, int k,
-       const connection_t connections[n][n])
+int q2(const airport_t *src, const airport_t *dest, int n, int k,const connection_t connections[n][n])
 {
     int visited[n];
     for (int i = 0; i < n; i++)
@@ -322,7 +441,15 @@ int q2(const airport_t *src, const airport_t *dest, int n, int k,
 
 int q3(const airport_t *src, int n, const connection_t connections[n][n])
 {
-    return 0;
+    pv pv_arr[n];
+    for (int i = 0; i < n; i++)
+    {
+        pv_arr[i].visited = 0;
+        pv_arr[i].parent = -1;
+    }
+    int source = src->num_id, flag = 0;
+    cycle(n, pv_arr, connections, source, source, &flag);
+    return flag;
 }
 
 void q4(int n, int (*predicate_func)(const airport_t *, const airport_t *), airport_t airport_list[n])
@@ -424,7 +551,19 @@ void q7(int n, const char *pat, int contains[n], const airport_t airports[n])
 
 int q8(int n, int trip_order[n - 1], const connection_t connections[n][n])
 {
-    return 0;
+    pv pv_arr[n];
+    int min = INT_MAX;
+    for (int i = 0; i < n; i++)
+    {
+        pv_arr[i].visited = 0;
+        pv_arr[i].parent = -1;
+    }
+    d_cycle(n, pv_arr, connections, 0, trip_order, &min);
+    if (min == INT_MAX)
+    {
+        return -1;
+    }
+    return min;
 }
 
 int q9(int n, pair_t edges[n - 1], const connection_t connections[n][n])
