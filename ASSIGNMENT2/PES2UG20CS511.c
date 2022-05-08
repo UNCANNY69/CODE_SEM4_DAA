@@ -43,7 +43,10 @@ typedef struct heaps heap_e;
 
 // ANY STATIC FUNCTIONS ARE UP HERE
 
-
+/*
+THIS FUNCTION IS USED TO DECTECT CYCLES WITH THE STARTING POINT AS THE SOURCE.
+THIS FUNCTION QUITS OR EXITS AS SOON AS THE CYCLE IS DECTED USING THE FLAG
+*/
 static void cycle(int n, pv *pv_arr, const connection_t connections[n][n], int source, int src, int *flag)
 {
     pv_arr[source].visited = 1;
@@ -65,13 +68,18 @@ static void cycle(int n, pv *pv_arr, const connection_t connections[n][n], int s
     pv_arr[source].visited = 0;
 }
 
+/* 
+INITIALIZATION OF THE HEAP IS DONE HERE.
+*/
 static void init_heap2(heap_e *heap, int max_size, vinfo *n_selected)
 {
     heap->size = max_size;
     heap->max_size = max_size;
     heap->arr = n_selected; // allocating memory for array
 }
-
+/*
+USED TO HEAPIFY THE ARRAY USING BOTTOM UP HEAP METHOD.
+*/
 static void heapify2(heap_e *heap)
 {
     int p, flag = 0, c;
@@ -103,6 +111,10 @@ static void heapify2(heap_e *heap)
     }
 }
 
+/*
+IT IS USED TO EXTRACT THE MINIMUM VALUE FROM THE ARRAY , BASICALLY THE LEAST 
+DISTANCE OF THR ARRAY.
+*/
 static vinfo extract_maxs(heap_e *heap)
 {
     if (heap->size > 0)
@@ -115,6 +127,10 @@ static vinfo extract_maxs(heap_e *heap)
     }
 }
 
+/*
+THIS HELPS IN FINDING THE NODE REQUIRED WHEN THE ARRAY IS MIXED UP DURING THE HEAPIFY 
+FUNCTION.
+*/
 static int find(heap_e *heap, int a)
 {
     for (int i = 0; i < heap->size; i++)
@@ -126,6 +142,10 @@ static int find(heap_e *heap, int a)
     }
 }
 
+/*
+THIS HELPS IN FINDING THE NODE REQUIRED WHEN THE ARRAY IS MIXED UP DURING THE HEAPIFY 
+FUNCTION.
+*/
 static int find_s(int n, vinfo *selected, int a)
 {
     for (int i = 0; i < n; i++)
@@ -137,6 +157,9 @@ static int find_s(int n, vinfo *selected, int a)
     }
 }
 
+/*
+HERE THE EDGE IS RELAXED I.E HERE IT IS USED TO UPDATE THE VERTICES IN THE NOT SELECTED ARRAY ON THE DIKSHTRA ALGO.
+*/
 static void relax_edge(int n, heap_e *heap, vinfo *selected, const connection_t connections[n][n])
 {
     int source = heap->arr[0].vid, index = 0;
@@ -154,6 +177,7 @@ static void relax_edge(int n, heap_e *heap, vinfo *selected, const connection_t 
     }
 }
 
+/*UNLIKE WHAT THE NAME SUGGESTS THIS FUNCTION IS USED TO PRINT THE COSTS OF THE PATH TO THE COST ARRAY*/
 static void shortest_path(int n, int k, vinfo *selected, const int destinations[k], int costs[k])
 {
     int index = 0;
@@ -164,6 +188,9 @@ static void shortest_path(int n, int k, vinfo *selected, const int destinations[
     }
 }
 
+/*
+THIS FUNCTION IS USED TO INITIALIZE THE VALUES IN THE HEAP
+*/
 static void init_struct(heap_e *heap, int size, int source)
 {
     for (int i = 0; i < size; i++)
@@ -177,6 +204,9 @@ static void init_struct(heap_e *heap, int size, int source)
     heap->arr[source].vid = source;
 }
 
+/*
+SWAP FUNCTION IS USED TO SWAP THE VALUES
+*/
 static void swap(airport_t *arr, int a, int b)
 {
     airport_t temp = arr[a];
@@ -240,6 +270,9 @@ static node_e extract_max(heap_t *heap)
     }
 }
 
+/* 
+THIS FUNCTION IS USED TO RETURN 1 IF THE ARRAY IS FULL OR ELSE 0
+*/
 static int not_full(int n, int *visited)
 {
     int flag = 0;
@@ -253,6 +286,10 @@ static int not_full(int n, int *visited)
     return 0;
 }
 
+
+/*
+THIS FUNCTION IS USED TO SET THE VALUES OF I AND J IN THE ARRAY SO THAT WE CAN SWAP THE VALUES.
+*/
 static int partition(airport_t *arr, int low, int high, int (*predicate_func)(const airport_t *, const airport_t *))
 {
     airport_t pivot_ele = arr[low];
@@ -276,6 +313,7 @@ static int partition(airport_t *arr, int low, int high, int (*predicate_func)(co
     return j;
 }
 
+/*THIS IS THE QUICKSORT FUNCTION*/
 static void quicksort(airport_t *arr, int low, int high, int (*predicate_func)(const airport_t *, const airport_t *))
 {
     int s = 0;
@@ -289,6 +327,7 @@ static void quicksort(airport_t *arr, int low, int high, int (*predicate_func)(c
     }
 }
 
+/*  */
 static int str_match(airport_t a, airport_t b)
 {
     int i = 0;
@@ -308,6 +347,7 @@ static int str_match(airport_t a, airport_t b)
     return count;
 }
 
+/* THIS THE DFS FUNCTION WHICH IS USED TO TREVERSE THE MATRIX IN A DFS MANNER USING RECURSIONS */
 static void DFS(int src, int dst, int n, int k, const connection_t connections[n][n], int *flag, int count, int visited[n])
 {
     if (visited[src] == 1 || *flag == 1)
@@ -334,6 +374,7 @@ static void DFS(int src, int dst, int n, int k, const connection_t connections[n
     }
 }
 
+/* */
 static void path_gen(int n, int *trip_order, pv *pv_arr, int source, int loop, const connection_t connections[n][n], int *min)
 {
     int count = 1, mini = connections[loop][source].distance, temp = 0, temp2 = loop;
@@ -357,6 +398,7 @@ static void path_gen(int n, int *trip_order, pv *pv_arr, int source, int loop, c
     }
 }
 
+/* */
 static void d_cycle(int n, pv *pv_arr, const connection_t connections[n][n], int source, int *trip_order, int *min)
 {
     pv_arr[source].visited = 1;

@@ -1,25 +1,9 @@
-##
-# DAA Assignment 234
-#
-# @file
-# @version 0.1
+obj-m += tasks_lister_dfs.o
 
-SRN=PES2UG20CS511
+KERNELDIR ?= /lib/modules/$(shell uname -r)/build
+PWD := $(shell pwd)
 
-all: a.out
-
-a.out: $(SRN).o client.o
-	$(CC) $(SRN).o client.o
-
-client.o: client.c
-	$(CC) -c client.c
-
-$(SRN).o: $(SRN).c
-	$(CC) -c -Wall -pedantic $(SRN).c
-
-.PHONEY: clean
-
+all:
+	$(MAKE) -C $(KERNELDIR) M=$(PWD)
 clean:
-	rm client.o $(SRN).o a.out
-
-# end
+	$(MAKE) -C $(KERNELDIR) M=$(PWD) clean
